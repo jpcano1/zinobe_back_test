@@ -19,14 +19,26 @@ REGIONS_BASE_HEADERS = {
 
 COUNTRY_BASE_URL = "https://restcountries.eu/rest/v2/region/"
 
+
 class Challenge:
+    """
+
+    """
     def __init__(self):
+        """
+
+        """
         self.data = self.init_data()
         self.conn = sqlite3.connect(os.getenv("SQLITE_DB", "example.db"))
         self.cursor = self.conn.cursor()
         self.init_db()
 
     def init_db(self):
+        """
+
+        :return:
+        :rtype:
+        """
         try:
             self.cursor.execute("""CREATE TABLE countries(
                 id INTEGER PRIMARY KEY,
@@ -40,6 +52,11 @@ class Challenge:
 
     @staticmethod
     def get_regions():
+        """
+
+        :return:
+        :rtype:
+        """
         response = httpx.get(
             REGIONS_BASE_URL + "all",
             headers=REGIONS_BASE_HEADERS
@@ -51,6 +68,11 @@ class Challenge:
         return list(regions.keys())
 
     def init_data(self):
+        """
+
+        :return:
+        :rtype:
+        """
         data = {
             "Region": [],
             "City Name": [],
@@ -79,11 +101,21 @@ class Challenge:
         return pd.DataFrame(data)
 
     def time_statistics(self):
+        """
+
+        :return:
+        :rtype:
+        """
         return self.data.agg({
             "Time": ["sum", "mean", "min", "max"]
         })
 
     def insert_data(self):
+        """
+
+        :return:
+        :rtype:
+        """
         for index, row in self.data.iterrows():
             try:
                 self.cursor.execute(f"""INSERT INTO countries(
@@ -102,16 +134,29 @@ class Challenge:
         return
 
     def save_json(self):
+        """
+
+        :return:
+        :rtype:
+        """
         self.data.to_json("data.json", orient="split", index=False)
 
     def finish(self):
+        """
+
+        :return:
+        :rtype:
+        """
         self.cursor.execute("DROP TABLE countries")
         self.conn.commit()
 
 
 challenge = Challenge()
 print("Initiated")
+print(challenge.data)
+print("Data")
 print(challenge.time_statistics())
+print("Statistics")
 challenge.insert_data()
 print("Data inserted")
 challenge.finish()
